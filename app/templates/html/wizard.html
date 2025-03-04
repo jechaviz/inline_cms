@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+  
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <title>InlineCMS Setup Wizard</title>
+  <style>
+    /* Minimal custom styling for the step indicators */
+    .step-item {
+      flex: 1;
+      padding: 1rem;
+      text-align: center;
+      transition: background-color 0.3s;
+    }
+    .step-item.active {
+      background-color: #4B5563; /* Tailwind: bg-slate-700 */
+      color: #E5E7EB; /* Tailwind: text-stone-200 */
+    }
+    .step-item.inactive {
+      background-color: #1F2937; /* Tailwind: bg-neutral-800 */
+      color: #9CA3AF; /* Tailwind: text-stone-400 */
+    }
+  </style>
+</head>
+<body class="bg-gray-800 text-gray-200">
+  <header class="h-16 bg-gradient-to-r from-slate-700 to-slate-800 text-center">
+    <h1 class="text-4xl font-light my-4">
+      InlineCMS
+      <span class="text-green-400 border-l border-zinc-800 pl-5 ml-4">Setup Wizard</span>
+    </h1>
+  </header>
+
+  <section class="p-5">
+    <div class="mb-10">
+      <ul class="flex space-x-2">
+        <li class="step-item active" data-step="start">Start</li>
+        <li class="step-item inactive" data-step="check">Server Check</li>
+        <li class="step-item inactive" data-step="site">Site</li>
+        <li class="step-item inactive" data-step="admin">Administrator</li>
+        <li class="step-item inactive" data-step="template">Template</li>
+        <li class="step-item inactive" data-step="finish">Finish</li>
+      </ul>
+    </div>
+
+    <div id="content" class="text-center">
+      <!-- Step 1: Start -->
+      <div class="step" id="step-start">
+        <h2 class="text-3xl font-bold mb-4">Welcome to InlineCMS</h2>
+        <p class="mb-4">
+          The wizard will check your server and ask for some details about the site.
+        </p>
+        <p class="mb-4">Please select which language you would like to use:</p>
+        <div id="languages" class="flex justify-center space-x-2">
+          <a href="?lang=en" class="language-option bg-cyan-700 text-stone-200 p-2 rounded hover:bg-cyan-600 transition">
+            English
+          </a>
+          <a href="?lang=ru" class="language-option bg-blue-700 text-stone-200 p-2 rounded hover:bg-blue-600 transition">
+            Русский
+          </a>
+        </div>
+      </div>
+
+      <!-- Step 2: Server Check -->
+      <div class="step hidden" id="step-check">
+        <h2 class="text-3xl font-bold mb-4">Checking your server</h2>
+        <table class="my-0 mx-auto w-4/5 border-collapse">
+          <tbody>
+            <tr>
+              <td class="py-2 text-lg text-left border-b border-neutral-700">
+                PHP 5.3.0 or higher
+              </td>
+              <td class="py-2 text-lg text-left border-b border-neutral-700">
+                <span class="text-green-400">Yes</span>
+              </td>
+            </tr>
+            <tr>
+              <td class="py-2 text-lg text-left border-b border-neutral-700">
+                JSON extension installed
+              </td>
+              <td class="py-2 text-lg text-left border-b border-neutral-700">
+                <span class="text-green-400">Yes</span>
+              </td>
+            </tr>
+            <tr>
+              <td class="py-2 text-lg text-left border-b border-neutral-700">
+                GD extension installed
+              </td>
+              <td class="py-2 text-lg text-left border-b border-neutral-700">
+                <span class="text-green-400">Yes</span>
+              </td>
+            </tr>
+            <tr>
+              <td class="py-2 text-lg text-left border-b border-neutral-700">
+                Folder <strong>data</strong> is writable
+              </td>
+              <td class="py-2 text-lg text-left border-b border-neutral-700">
+                <span class="text-green-400">Yes</span>
+              </td>
+            </tr>
+            <tr>
+              <td class="py-2 text-lg text-left border-b border-neutral-700">
+                Folder <strong>upload</strong> is writable
+              </td>
+              <td class="py-2 text-lg text-left border-b border-neutral-700">
+                <span class="text-green-400">Yes</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Step 3: Site Info -->
+      <div class="step hidden" id="step-site">
+        <h2 class="text-3xl font-bold mb-4">Site Info</h2>
+        <form>
+          <table class="my-0 mx-auto w-4/5 border-collapse">
+            <tbody>
+              <tr>
+                <td class="py-2 text-lg text-left border-b border-neutral-700">
+                  Site Name:
+                </td>
+                <td class="py-2 text-lg text-left border-b border-neutral-700">
+                  <input type="text" class="p-1 w-full rounded border border-stone-300 bg-zinc-900" />
+                </td>
+              </tr>
+              <tr>
+                <td class="py-2 text-lg text-left border-b border-neutral-700">
+                  Short Site Description:
+                </td>
+                <td class="py-2 text-lg text-left border-b border-neutral-700">
+                  <textarea class="p-1 w-full h-20 rounded border border-stone-300 bg-zinc-900"></textarea>
+                </td>
+              </tr>
+              <tr>
+                <td class="py-2 text-lg text-left border-b border-neutral-700">
+                  Site Languages:
+                </td>
+                <td class="py-2 text-lg text-left border-b border-neutral-700">
+                  <div id="site-languages">
+                    <ul class="list-disc list-inside">
+                      <li>English</li>
+                    </ul>
+                    <a id="add-language" href="#" class="text-blue-400 hover:underline">
+                      Add language
+                    </a>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </form>
+      </div>
+
+      <!-- Step 4: Administrator -->
+      <div class="step hidden" id="step-admin">
+        <h2 class="text-3xl font-bold mb-4">Create Administrator Account</h2>
+        <form>
+          <table class="my-0 mx-auto w-4/5 border-collapse">
+            <tbody>
+              <tr>
+                <td class="py-2 text-lg text-left border-b border-neutral-700">
+                  E-mail:
+                </td>
+                <td class="py-2 text-lg text-left border-b border-neutral-700">
+                  <input type="email" class="p-1 w-full rounded border border-stone-300 bg-zinc-900" />
+                </td>
+              </tr>
+              <tr>
+                <td class="py-2 text-lg text-left border-b border-neutral-700">
+                  Password:
+                </td>
+                <td class="py-2 text-lg text-left border-b border-neutral-700">
+                  <input type="password" class="p-1 w-full rounded border border-stone-300 bg-zinc-900" />
+                </td>
+              </tr>
+              <tr>
+                <td class="py-2 text-lg text-left border-b border-neutral-700">
+                  Repeat password:
+                </td>
+                <td class="py-2 text-lg text-left border-b border-neutral-700">
+                  <input type="password" class="p-1 w-full rounded border border-stone-300 bg-zinc-900" />
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </form>
+      </div>
+
+      <!-- Step 5: Template -->
+      <div class="step hidden" id="step-template">
+        <h2 class="text-3xl font-bold mb-4">Page Layouts</h2>
+        <p class="mb-4">
+          Select template files that you want to use as layouts for pages of the site.
+        </p>
+        <form>
+          <table class="my-0 mx-auto w-4/5 border-collapse">
+            <thead>
+              <tr>
+                <th class="py-2 text-lg text-left border-b border-neutral-700">
+                  Layout File
+                </th>
+                <th class="py-2 text-lg text-left border-b border-neutral-700">
+                  Layout Name
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="py-2 text-lg text-left border-b border-neutral-700">
+                  <input type="checkbox" class="mr-2" /> legendarios.htm
+                </td>
+                <td class="py-2 text-lg text-left border-b border-neutral-700">
+                  <input type="text" class="p-1 w-full rounded border border-stone-300 bg-zinc-900" value="Legendarios" />
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </form>
+      </div>
+
+      <!-- Step 6: Finish -->
+      <div class="step hidden" id="step-finish">
+        <h2 class="text-3xl font-bold mb-4">Completing the setup</h2>
+        <p class="mb-4">
+          Now Layout Editor will be started, where you can choose which parts of each of your layouts should be editable.
+        </p>
+        <p class="mb-4">
+          After that you will be able to begin filling content to your site.
+        </p>
+        <p class="mb-4">
+          <strong>Please note:</strong><br />
+          InlineCMS is free only for personal use. If you're going to charge your client for this site, please buy a 
+          <a href="http://inlinecms.com/download" target="_blank" class="text-blue-400 hover:underline">commercial license</a>.
+        </p>
+        <h3 class="text-2xl font-bold">Thank you for using InlineCMS!</h3>
+      </div>
+    </div>
+
+    <div class="mt-5 mb-10 text-center">
+      <button class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded mr-2" id="backBtn">
+        Back
+      </button>
+      <button class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded" id="nextBtn">
+        Continue
+      </button>
+    </div>
+  </section>
+
+  <footer class="h-16 bg-gradient-to-r from-slate-700 to-slate-800 text-center flex items-center justify-center">
+    <p>InlineCMS Team © 2025</p>
+  </footer>
+
+  <script>
+    $(document).ready(function() {
+      let currentStep = 0;
+      const steps = $('.step');
+
+      function updateStepIndicator() {
+        $('.step-item').removeClass('active inactive');
+        $('.step-item').each(function(index) {
+          $(this).addClass(index === currentStep ? 'active' : 'inactive');
+        });
+
+        // Disable back button on first step and change next button text on last step
+        if (currentStep === 0) {
+          $('#backBtn').prop('disabled', true).addClass('opacity-50 cursor-not-allowed');
+        } else {
+          $('#backBtn').prop('disabled', false).removeClass('opacity-50 cursor-not-allowed');
+        }
+
+        if (currentStep === steps.length - 1) {
+          $('#nextBtn').text('Finish')
+            .removeClass('bg-green-500 hover:bg-green-600')
+            .addClass('bg-blue-500 hover:bg-blue-600');
+        } else {
+          $('#nextBtn').text('Continue')
+            .removeClass('bg-blue-500 hover:bg-blue-600')
+            .addClass('bg-green-500 hover:bg-green-600');
+        }
+      }
+
+      function showStep(newStep) {
+        $(steps[currentStep]).fadeOut(300, function() {
+          currentStep = newStep;
+          $(steps[currentStep]).fadeIn(300);
+          updateStepIndicator();
+        });
+      }
+
+      $('#nextBtn').click(function() {
+        if (currentStep < steps.length - 1) {
+          showStep(currentStep + 1);
+        } else {
+          // Final step: finish wizard action
+          alert('Setup complete!');
+        }
+      });
+
+      $('#backBtn').click(function() {
+        if (currentStep > 0) {
+          showStep(currentStep - 1);
+        }
+      });
+
+      // Dynamically add new language input when clicking "Add language"
+      $('#add-language').click(function(e) {
+        e.preventDefault();
+        var newLang = $('<li class="mt-2"><input type="text" class="p-1 rounded border border-stone-300 bg-zinc-900" placeholder="New language" /></li>');
+        $('#site-languages ul').append(newLang);
+      });
+
+      // Initialize the first step and update indicators
+      $(steps[currentStep]).show();
+      updateStepIndicator();
+    });
+  </script>
+</body>
+</html>

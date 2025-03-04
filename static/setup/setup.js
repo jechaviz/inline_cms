@@ -1,1 +1,132 @@
-function SetupWizard(a){this.steps=[];this.currentStep;this.options=a;this.data={lang:a.lang};this.showMessageDialog=function(f){var b=f;if(typeof(f)==="object"){b=$("<ul></ul>").addClass("messages-list");for(var d in f){var c=$("<li></li>").html(f[d]);b.append(c)}}var e={};e.Ok=function(){$(this).dialog("close")};$('<div class="message-text inlinecms"></div>').append(b).dialog({title:this.options.title,modal:true,resizable:false,width:350,buttons:e})};this.centerLoadingIndicator=function(){var b=$("#content");$("#loading-indicator").css({width:b.outerWidth(),height:b.outerHeight(),lineHeight:b.outerHeight()+"px",left:b.offset().left,top:b.offset().top})};this.showLoadingIndicator=function(){if($("#loading-indicator:visible").length>0){return}$("#loading-indicator").show();$("#content").addClass("faded")};this.hideLoadingIndicator=function(){if($("#loading-indicator:visible").length==0){return}$("#loading-indicator").hide();$("#content").removeClass("faded")};this.runModule=function(b,c,d,e){d._module=b;d._action=c;$.post(this.options.backendUrl,d,function(f){if(typeof(e)==="function"){e(f)}},"json")};this.validateStep=function(c){this.showLoadingIndicator();var b={};if($("#content form").length>0){$("#content form *[name]").each(function(){var d=$(this);b[d.attr("name")]=d.val()});this.data=$.extend(this.data,b)}b.step=this.currentStep;b.lang=setup.options.lang;setup.runModule("setup","validateStep",b,function(d){if(d.success){c();return}setup.hideLoadingIndicator();setup.showMessageDialog(d.error)})};this.onStepChanged=function(d,c){this.centerLoadingIndicator();this.currentStep=c;$("#steps li").removeClass("active");$("#steps li").removeClass("passed");var b=$("#steps li[data-step="+c+"]").addClass("active").index();$("#steps li:lt("+b+")").addClass("passed");$("#steps-cache .step-"+c).remove();$(".buttons .b-prev").toggle(c!=this.steps[0]);$(".buttons .b-next").toggle(c!="finish");$(".buttons .b-finish").toggle(c=="finish");$("#content input:text").eq(0).focus()};this.loadStep=function(b){var c=this.currentStep;if($("#steps-cache .step-"+b).length>0&&(c!=b)){this.hideLoadingIndicator();$("#content").html($("#steps-cache .step-"+b).html());this.onStepChanged(c,b);return}this.showLoadingIndicator();setTimeout(function(){setup.runModule("setup","loadStep",{step:b,lang:setup.options.lang},function(d){$("#content").html(d.html);setup.onStepChanged(c,b);setup.hideLoadingIndicator()})},200)};this.unloadStep=function(){$("form input:text",$("#content")).each(function(){$(this).attr("value",$(this).val())});$("form input:password",$("#content")).each(function(){$(this).attr("value",$(this).val())});$("form textarea",$("#content")).each(function(){$(this).html($(this).val())});var b=$("#content").clone().removeAttr("id").removeClass("faded");b.addClass("step-"+this.currentStep).appendTo("#steps-cache")};this.nextStep=function(){var c=this.steps.indexOf(this.currentStep)+1;if(c<this.steps.length){var b=this.steps[c];this.validateStep(function(){setup.unloadStep();setup.loadStep(b)})}};this.prevStep=function(){var c=this.steps.indexOf(this.currentStep)-1;if(c>=0){var b=this.steps[c];setup.unloadStep();setup.loadStep(b)}};this.finish=function(){this.showLoadingIndicator();this.runModule("setup","save",this.data,function(b){if(b.success){window.location.href=b.next_url;return}})};this.start=function(){this.centerLoadingIndicator();$("#steps li").each(function(){var b=$(this).data("step");setup.steps.push(b);if($(this).hasClass("active")){setup.currentStep=b}});$(".buttons .b-next").click(function(){setup.nextStep()});$(".buttons .b-prev").click(function(){setup.prevStep()});$(".buttons .b-finish").click(function(){setup.finish()})}};
+function SetupWizard(options) {
+    this.steps = [];
+    this.currentStep = null;
+    this.options = options;
+    this.data = { lang: options.lang };
+
+    this.showMessageDialog = function(message) {
+        if (typeof message === 'object') {
+            message = Object.values(message).join("\n");
+        }
+        alert(message);
+    };
+
+    this.showLoadingIndicator = function() {
+        $('#loading-indicator').show();
+        $('#content').addClass('faded');
+    };
+
+    this.hideLoadingIndicator = function() {
+        $('#loading-indicator').hide();
+        $('#content').removeClass('faded');
+    };
+
+    this.runModule = function(module, action, params, callback) {
+        params._module = module;
+        params._action = action;
+        $.post(this.options.backendUrl, params, function(result) {
+            if (typeof callback === 'function') {
+                callback(result);
+            }
+        }, 'json');
+    };
+
+    this.validateStep = function(callback) {
+        this.showLoadingIndicator();
+        var params = {};
+        $('#content form *[name]').each(function() {
+            params[$(this).attr('name')] = $(this).val();
+        });
+        this.data = $.extend(this.data, params);
+        params.step = this.currentStep;
+        params.lang = this.options.lang;
+        var self = this;
+        this.runModule('setup', 'validateStep', params, function(result) {
+            if (result.success) {
+                callback();
+            } else {
+                self.hideLoadingIndicator();
+                self.showMessageDialog(result.error);
+            }
+        });
+    };
+
+    this.onStepChanged = function(oldStep, step) {
+        this.currentStep = step;
+        $('#steps li').removeClass('active passed');
+        var index = $('#steps li[data-step="'+step+'"]').addClass('active').index();
+        $('#steps li:lt('+index+')').addClass('passed');
+        $('.buttons .b-prev').toggle(step !== this.steps[0]);
+        $('.buttons .b-next').toggle(step !== 'finish');
+        $('.buttons .b-finish').toggle(step === 'finish');
+        $('#content input:text').eq(0).focus();
+    };
+
+    this.loadStep = function(step) {
+        var oldStep = this.currentStep;
+        if ($('#steps-cache .step-' + step).length > 0 && oldStep !== step) {
+            this.hideLoadingIndicator();
+            $('#content').html($('#steps-cache .step-' + step).html());
+            this.onStepChanged(oldStep, step);
+            return;
+        }
+        this.showLoadingIndicator();
+        var self = this;
+        this.runModule('setup', 'loadStep', { step: step, lang: this.options.lang }, function(result) {
+            $('#content').html(result.html);
+            self.onStepChanged(oldStep, step);
+            self.hideLoadingIndicator();
+        });
+    };
+
+    this.unloadStep = function() {
+        $('form input:text, form input:password, form textarea', $('#content')).each(function() {
+            $(this).attr('value', $(this).val());
+        });
+        var cache = $('#content').clone().removeAttr('id').removeClass('faded');
+        cache.addClass('step-' + this.currentStep).appendTo('#steps-cache');
+    };
+
+    this.nextStep = function() {
+        var currentIndex = this.steps.indexOf(this.currentStep);
+        var nextStepIndex = currentIndex + 1;
+        if (nextStepIndex < this.steps.length) {
+            var nextStep = this.steps[nextStepIndex];
+            var self = this;
+            this.validateStep(function() {
+                self.unloadStep();
+                self.loadStep(nextStep);
+            });
+        }
+    };
+
+    this.prevStep = function() {
+        var currentIndex = this.steps.indexOf(this.currentStep);
+        var prevStepIndex = currentIndex - 1;
+        if (prevStepIndex >= 0) {
+            var prevStep = this.steps[prevStepIndex];
+            this.unloadStep();
+            this.loadStep(prevStep);
+        }
+    };
+
+    this.finish = function() {
+        this.showLoadingIndicator();
+        this.runModule('setup', 'save', this.data, function(result) {
+            if (result.success) {
+                window.location.href = result.next_url;
+            }
+        });
+    };
+
+    this.start = function() {
+        $('#steps li').each(function() {
+            var stepId = $(this).data('step');
+            setup.steps.push(stepId);
+            if ($(this).hasClass('active')) { setup.currentStep = stepId; }
+        });
+        $('.buttons .b-next').click(() => this.nextStep());
+        $('.buttons .b-prev').click(() => this.prevStep());
+        $('.buttons .b-finish').click(() => this.finish());
+    };
+}

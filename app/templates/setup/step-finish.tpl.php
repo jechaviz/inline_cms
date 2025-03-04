@@ -1,8 +1,9 @@
-<h2><?php echo $lang['finish']; ?></h2>
+<h2 class="text-3xl font-bold mb-4"><?php echo $lang['finish']; ?></h2>
 
-<p><?php echo $lang['finishNow']; ?></p>
-<p><?php echo $lang['finishThen']; ?></p>
-<p><?php printf($lang['finishNotice'], 'http://inlinecms.com/download'); ?></p>
+<p class="mb-2"><?php echo $lang['finishNow']; ?></p>
+<p class="mb-2"><?php echo $lang['finishThen']; ?></p>
+<p class="mb-4">
+  <?php printf($lang['finishNotice'], '<a href="http://inlinecms.com/download" target="_blank" class="text-blue-400 hover:underline">inlinecms.com/download</a>'); ?>
+</p>
 
-<h3><?php echo $lang['finishThanks']; ?></h3>
-
+<h3 class="text-2xl font-bold"><?php echo $lang['finishThanks']; ?></h3>
