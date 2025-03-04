@@ -1,0 +1,545 @@
+<html lang="es"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Legendarios - Despierta tu Grandeza</title>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&amp;family=Roboto+Flex:opsz,wght@8..144,300;8..144,400;8..144,700&amp;display=swap" rel="stylesheet">
+  <!-- Tailwind CSS CDN -->
+  <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+  <!-- jQuery CDN -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <!-- Firebase CDN -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
+  <style>
+    /* Tailwind Configuration */
+    @tailwind base;
+    @tailwind components;
+    @tailwind utilities;
+
+    :root {
+      --color-slate: #1d293d;
+      --color-golden: #b19f70;
+      --color-red: #cf854c;
+      --color-black: #363839;
+      --color-white: #ffffff;
+    }
+
+    @layer base {
+      body {
+        @apply font-roboto text-[1.7rem] leading-[1.58] text-[var(--color-black)] bg-[var(--color-white)] overflow-x-hidden;
+      }
+      h1, h2, h3 {
+        @apply font-bebas;
+      }
+      .btn {
+        @apply inline-flex items-center justify-center font-bebas text-[2rem] px-6 py-2 border-2 border-[var(--color-golden)] text-[var(--color-golden)] hover:bg-[var(--color-golden)] hover:text-[var(--color-black)] transition duration-300;
+      }
+      .btn-dark {
+        @apply inline-flex items-center justify-center font-bebas text-[2rem] px-6 py-2 border-2 border-[var(--color-slate)] text-[var(--color-slate)] hover:bg-[var(--color-slate)] hover:text-[var(--color-white)] transition duration-300;
+      }
+      .font-bebas { font-family: 'Bebas Neue', sans-serif; }
+      .font-roboto { font-family: 'Roboto Flex', sans-serif; }
+    }
+
+    /* Custom Styles */
+    .card-hover {
+      @apply transform transition duration-300 hover:scale-105 hover:shadow-lg;
+    }
+    .overlay-hover {
+      @apply absolute inset-0 bg-[var(--color-black)] bg-opacity-0 hover:bg-opacity-20 transition duration-300;
+    }
+    .header-section {
+      height: 100vh;
+      position: relative;
+      overflow: hidden;
+    }
+    .slide {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: no-repeat center center/cover;
+      opacity: 0;
+      transition: opacity 1s ease;
+    }
+    .slide.active {
+      opacity: 1;
+    }
+    .drawer {
+      position: fixed;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      max-width: 400px;
+      height: 100%;
+      background: var(--color-white);
+      transition: left 0.3s ease;
+      z-index: 50;
+      overflow-y: auto;
+    }
+    .drawer.open { left: 0; }
+    .drawer-close {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      cursor: pointer;
+      font-size: 2rem;
+    }
+  </style>
+</head>
+<body class="relative min-h-screen vsc-initialized">
+
+  <!-- Header Section with Carousel -->
+  <header class="header-section">
+    <div class="absolute inset-0 z-10">
+      <!-- Slide 1 -->
+      <div class="slide" style="background: linear-gradient(45deg, var(--color-slate) 0%, rgba(0, 0, 0, 0.2) 80%), url('https://images.unsplash.com/photo-1519681393784-d120267933ba') no-repeat center center/cover;">
+        <!-- Additional Image Options:
+          'https://images.unsplash.com/photo-1454496522488-7a8e488e8606',
+          'https://images.unsplash.com/photo-1483729558449-99ef09a8c325',
+          'https://images.unsplash.com/photo-1506748686214-e9df14d4d9d0',
+          'https://images.unsplash.com/photo-1472214103451-9374e2e7e616',
+          'https://images.unsplash.com/photo-1507525428034-b723cf961d3e',
+          'https://images.unsplash.com/photo-1519125323398-675f398f6978',
+          'https://images.unsplash.com/photo-1520962922322-6b3c13514db5',
+          'https://images.unsplash.com/photo-1533035353720-f1c6a75cd8ab',
+          'https://images.unsplash.com/photo-1541701494587-71d7e3c2ec17'
+        -->
+        <div class="absolute inset-0 flex flex-col items-center justify-center text-center text-[var(--color-white)] p-4">
+          <h1 class="text-6xl sm:text-[8rem] md:text-[10rem] leading-tight font-bebas">DESPIERTA TU GRANDEZA</h1>
+          <p class="mt-6 text-lg sm:text-xl font-roboto font-light">Únete a Legendarios y transforma tu vida.</p>
+          <a href="#contacto" class="btn mt-6">ÚNETE AHORA</a>
+        </div>
+      </div>
+      <!-- Slide 2 -->
+      <div class="slide" style="background: linear-gradient(45deg, var(--color-slate) 0%, rgba(0, 0, 0, 0.2) 80%), url('https://images.unsplash.com/photo-1522205787843-417a637f4c30') no-repeat center center/cover;">
+        <!-- Additional Image Options:
+          '',
+          '',
+          'https://images.unsplash.com/photo-1536599018102-9f803c140fc1',
+          'https://images.unsplash.com/photo-1541233349642-6e425fe027eb',
+          'https://images.unsplash.com/photo-1503437314548-2d7d7e8c03e8',
+          'https://images.unsplash.com/photo-1518837695005-208d18b3c7d7',
+          'https://images.unsplash.com/photo-1529333166437-77574b5fdd34',
+          'https://images.unsplash.com/photo-1543269865-cbf427effabad',
+          'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee'
+        -->
+        <div class="absolute inset-0 flex flex-col items-center justify-center text-center text-[var(--color-white)] p-4">
+          <h1 class="text-6xl sm:text-[8rem] md:text-[10rem] leading-tight font-bebas">CONQUISTA TUS MONTAÑAS</h1>
+          <p class="mt-6 text-lg sm:text-xl font-roboto font-light">Supera tus límites en el Cañón del Búfalo.</p>
+          <a href="#eventos" class="btn mt-6">DESCUBRE MÁS</a>
+        </div>
+      </div>
+      <!-- Slide 3 -->
+      <div class="slide active" style="background: linear-gradient(45deg, var(--color-slate) 0%, rgba(0, 0, 0, 0.2) 80%), url('https://images.unsplash.com/photo-1740383236444-b7eb88a9baa5?q=80&amp;w=1770&amp;auto=format&amp;fit=crop&amp;ixlib=rb-4.0.3&amp;ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D') no-repeat center center/cover;">
+        <!-- Additional Image Options:
+          '',
+          '',
+          '',
+          'https://images.unsplash.com/photo-1542228262-3d6630c659c7',
+          'https://images.unsplash.com/photo-1518098261495-7b8a6f9f7f77',
+          'https://images.unsplash.com/photo-1529339944189-4b3a4d2a6f2f',
+          'https://images.unsplash.com/photo-1508186736573-4c2c36b8db22',
+          'https://images.unsplash.com/photo-1543867892-4e7f8e4d6879',
+          'https://images.unsplash.com/photo-1517021897930-607d66c8e9a8'
+        -->
+        <div class="absolute inset-0 flex flex-col items-center justify-center text-center text-[var(--color-white)] p-4">
+          <h1 class="text-6xl sm:text-[8rem] md:text-[10rem] leading-tight font-bebas">VIVE LA AVENTURA</h1>
+          <p class="mt-6 text-lg sm:text-xl font-roboto font-light">Descubre tu propósito en la naturaleza.</p>
+          <a href="#galeria" class="btn mt-6">EXPLORA LA GALERÍA</a>
+        </div>
+      </div>
+    </div>
+    <div class="relative z-20 container mx-auto p-6 flex justify-between items-center">
+      <div class="logo">
+        <a href="#"><img src="https://via.placeholder.com/150" alt="Logo Legendarios" class="h-12"></a>
+      </div>
+      <nav class="hidden md:flex *:hover:text-[var(--color-golden)] *:text-[var(--color-white)] font-bebas text-2xl *:transition *:duration-300 space-x-10 *:py-2">
+        <a href="#inicio">INICIO</a>
+        <a href="#por-que">POR QUÉ LEGENDARIOS</a>
+        <a href="#eventos">EVENTOS</a>
+        <a href="#testimonios">TESTIMONIOS</a>
+        <a href="#galeria">GALERÍA</a>
+        <a href="#blog">BLOG</a>
+        <a href="#faqs">FAQS</a>
+        <a href="#" class="border border-[var(--color-white)] px-6 toggle-drawer" data-target="login-drawer">ENTRAR</a>
+      </nav>
+      <button id="mobileMenuBtn" class="md:hidden text-[var(--color-golden)]">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+        </svg>
+      </button>
+    </div>
+    <div id="mobileMenu" class="hidden absolute top-full left-0 w-full bg-[var(--color-slate)] text-[var(--color-golden)] p-4 z-20 md:hidden">
+      <a href="#inicio" class="block py-2">INICIO</a>
+      <a href="#por-que" class="block py-2">POR QUÉ LEGENDARIOS</a>
+      <a href="#eventos" class="block py-2">EVENTOS</a>
+      <a href="#testimonios" class="block py-2">TESTIMONIOS</a>
+      <a href="#galeria" class="block py-2">GALERÍA</a>
+      <a href="#blog" class="block py-2">BLOG</a>
+      <a href="#faqs" class="block py-2">FAQS</a>
+      <a href="#" class="block py-2 toggle-drawer" data-target="login-drawer">ENTRAR</a>
+    </div>
+  </header>
+
+  <!-- Countdown Timer Section -->
+  <section class="bg-gray-100 py-8">
+    <div class="container mx-auto text-center">
+      <h2 class="text-2xl md:text-3xl font-bold text-[var(--color-slate)] mb-4 uppercase tracking-widest">HASTA EL INICIO DE TOP 921</h2>
+      <div class="flex flex-col md:flex-row justify-center space-y-4 md:space-y-0 md:space-x-4">
+        <div class="bg-[var(--color-slate)] text-[var(--color-white)] p-4 rounded-lg shadow-lg text-center">
+          <span class="text-4xl md:text-5xl font-bold block" id="days">10</span>
+          <span class="text-sm uppercase tracking-widest">Días</span>
+        </div>
+        <div class="bg-[var(--color-white)] text-[var(--color-slate)] p-4 rounded-lg shadow-lg text-center">
+          <span class="text-4xl md:text-5xl font-bold block" id="hours">3</span>
+          <span class="text-sm uppercase tracking-widest">Horas</span>
+        </div>
+        <div class="bg-[var(--color-slate)] text-[var(--color-white)] p-4 rounded-lg shadow-lg text-center">
+          <span class="text-4xl md:text-5xl font-bold block" id="minutes">37</span>
+          <span class="text-sm uppercase tracking-widest">Minutos</span>
+        </div>
+        <div class="bg-[var(--color-white)] text-[var(--color-slate)] p-4 rounded-lg shadow-lg text-center">
+          <span class="text-4xl md:text-5xl font-bold block" id="seconds">39</span>
+          <span class="text-sm uppercase tracking-widest">Segundos</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Por Qué Legendarios Section -->
+  <section id="por-que" class="bg-slate-900 py-12">
+    <div class="container mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-12">
+      <div class="relative">
+        <img src="https://images.unsplash.com/photo-1556848524-7272bf936595" alt="Camino en la montaña" class="w-full h-[50vh] object-cover border border-[var(--color-white)]">
+        <p class="absolute bottom-4 left-4 text-[var(--color-white)] font-bebas text-[3rem]">TRANSFORMACIÓN</p>
+      </div>
+      <div class="flex flex-col justify-center text-[var(--color-white)]">
+        <h2 class="text-[5rem] md:text-[6rem] leading-tight font-bebas">POR QUÉ LEGENDARIOS</h2>
+        <p class="mt-4 font-roboto font-normal">En Legendarios, creemos que los desafíos en la naturaleza y el apoyo de una comunidad pueden transformar vidas.</p>
+        <a href="#contacto" class="btn-dark mt-6 w-36">ÚNETE AHORA</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Eventos Section -->
+  <section id="eventos" class="bg-gray-100 py-12">
+    <div class="container mx-auto px-6 text-center">
+      <h2 class="text-[5rem] md:text-[6rem] leading-tight font-bebas text-[var(--color-slate)]">PRÓXIMOS EVENTOS</h2>
+      <p class="mt-4 font-roboto font-normal max-w-3xl mx-auto">Participa en retos y experiencias únicas.</p>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-12">
+        <div class="relative card-hover">
+          <img src="https://images.unsplash.com/photo-1547770225-29b16c12a560" alt="Reto Cañón del Búfalo" class="w-full h-64 object-cover border border-[var(--color-black)]">
+          <div class="overlay-hover"></div>
+          <p class="absolute bottom-4 left-4 text-[var(--color-white)] font-bebas text-[2.5rem]">RETO CAÑÓN DEL BÚFALO</p>
+        </div>
+        <div class="relative card-hover">
+          <img src="https://images.unsplash.com/photo-1498278854500-7c206daa073b" alt="Retiro Montaña" class="w-full h-64 object-cover border border-[var(--color-black)]">
+          <div class="overlay-hover"></div>
+          <p class="absolute bottom-4 left-4 text-[var(--color-white)] font-bebas text-[2.5rem]">RETIRO DE MONTAÑA</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Testimonios Section -->
+  <section id="testimonios" class="bg-[var(--color-slate)] py-12 text-center text-[var(--color-white)]">
+    <div class="container mx-auto px-6">
+      <p class="text-[3rem] md:text-[4rem] font-roboto font-normal leading-tight">"LEGENDARIOS ME DIO LA FUERZA PARA SUPERAR MIS LÍMITES." – JUAN PÉREZ</p>
+      <p class="mt-4 font-roboto font-light">Juan Pérez, Participante</p>
+    </div>
+  </section>
+
+  <!-- Galería Section -->
+  <section id="galeria" class="bg-gray-100 py-12">
+    <div class="container mx-auto px-6 text-center">
+      <h2 class="text-[5rem] md:text-[6rem] leading-tight font-bebas text-[var(--color-slate)]">GALERÍA DE INSPIRACIÓN</h2>
+      <p class="mt-4 font-roboto font-normal max-w-3xl mx-auto">Revive la emoción de nuestros eventos.</p>
+      <div class="mt-12 relative card-hover">
+        <img src="https://images.unsplash.com/photo-1519681393784-d120267933ba" alt="Montaña al amanecer" class="w-full h-[60vh] object-cover border border-[var(--color-black)]">
+        <div class="overlay-hover"></div>
+        <div class="absolute bottom-4 left-4 text-[var(--color-white)]">
+          <p class="font-bebas text-[3rem] leading-tight">MONTAÑA AL AMANECER</p>
+          <a href="#" class="btn mt-4">VER MÁS</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Blog Section -->
+  <section id="blog" class="bg-[var(--color-slate)] text-[var(--color-white)] py-12">
+    <div class="container mx-auto px-6">
+      <h2 class="text-[5rem] md:text-[6rem] leading-tight font-bebas text-center">BLOG</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8">
+        <div class="bg-[var(--color-white)] p-6 rounded-lg shadow-md">
+          <h3 class="text-2xl font-bold text-[var(--color-slate)]">La Canción del Legendario</h3>
+          <p class="mt-2 text-[var(--color-black)]">He de romper la jaula de lo conocido...</p>
+          <a href="#" class="text-[var(--color-red)] hover:text-[var(--color-golden)] mt-4 block">Leer Más</a>
+        </div>
+        <div class="bg-[var(--color-white)] p-6 rounded-lg shadow-md">
+          <h3 class="text-2xl font-bold text-[var(--color-slate)]">Vidas Transformadas</h3>
+          <p class="mt-2 text-[var(--color-black)]">TOP es un evento de 72 horas...</p>
+          <a href="#" class="text-[var(--color-red)] hover:text-[var(--color-golden)] mt-4 block">Leer Más</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQs Section -->
+  <section id="faqs" class="bg-gray-100 py-12">
+    <div class="container mx-auto px-6">
+      <h2 class="text-[5rem] md:text-[6rem] leading-tight font-bebas text-[var(--color-slate)] text-center">PREGUNTAS FRECUENTES</h2>
+      <div class="mt-8 space-y-4">
+        <div>
+          <button class="flex justify-between w-full p-4 bg-[var(--color-white)] rounded shadow-md text-[var(--color-slate)]">
+            <span>¿Qué es Legendarios?</span>
+            <span>+</span>
+          </button>
+          <div class="hidden p-4 text-[var(--color-black)]">
+            Legendarios es una comunidad que inspira a los hombres a encontrar propósito a través de desafíos en la naturaleza.
+          </div>
+        </div>
+        <div>
+          <button class="flex justify-between w-full p-4 bg-[var(--color-white)] rounded shadow-md text-[var(--color-slate)]">
+            <span>¿Cómo me registro para un evento?</span>
+            <span>+</span>
+          </button>
+          <div class="hidden p-4 text-[var(--color-black)]">
+            Haz clic en "REGISTRARSE" en la navegación y completa el formulario.
+          </div>
+        </div>
+        <div>
+          <button class="flex justify-between w-full p-4 bg-[var(--color-white)] rounded shadow-md text-[var(--color-slate)]">
+            <span>¿Qué debo llevar en mi mochila?</span>
+            <span>+</span>
+          </button>
+          <div class="hidden p-4 text-[var(--color-black)]">
+            Ropa para hiking, tienda de campaña, saco de dormir, linterna, etc. Consulta la lista completa en la información del evento.
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer Section -->
+  <footer id="contacto" class="bg-[var(--color-slate)] text-[var(--color-white)] py-12 relative">
+    <div class="absolute inset-0 opacity-50">
+      <img src="https://images.unsplash.com/photo-1434394354979-a235cd36269d" alt="Paisaje Montañoso" class="w-full h-full object-cover">
+    </div>
+    <div class="relative z-10 container mx-auto px-6 text-center">
+      <h2 class="text-[4rem] md:text-[5rem] leading-tight font-bebas">ÚNETE A LA COMUNIDAD</h2>
+      <form class="space-y-6 max-w-md mx-auto mt-6" id="subscription-form">
+        <input type="text" placeholder="Nombre" class="bg-transparent border-b border-[var(--color-white)] text-[var(--color-white)] w-full font-roboto font-normal focus:outline-none" required="">
+        <input type="email" placeholder="Correo Electrónico" class="bg-transparent border-b border-[var(--color-white)] text-[var(--color-white)] w-full font-roboto font-normal focus:outline-none" required="">
+        <button type="submit" class="btn">SUSCRIBIRSE</button>
+      </form>
+      <div class="mt-12 grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="flex justify-center md:justify-end items-center">
+          <img src="https://via.placeholder.com/150" alt="Logo Legendarios" class="h-18">
+        </div>
+        <div class="text-left sm:border-l-2 pl-6 py-10">
+          <p class="font-roboto font-normal">Contacto: +52 123 456 7890</p>
+          <p class="font-roboto font-normal">Email: info@legendarios.com</p>
+          <p class="font-roboto font-normal">Ubicación: Querétaro, México</p>
+        </div>
+      </div>
+      <p class="mt-12 font-bebas text-[1.5rem]">© 2025 Legendarios. Todos los derechos reservados.</p>
+    </div>
+  </footer>
+
+  <!-- Login Drawer -->
+  <div id="login-drawer" class="drawer">
+    <span class="drawer-close">×</span>
+    <div class="p-6">
+      <h2 class="text-[3rem] font-bebas mb-4 text-[var(--color-slate)]">Iniciar Sesión</h2>
+      <form id="login-form" class="space-y-4">
+        <input type="email" placeholder="Correo Electrónico" class="w-full p-2 border border-[var(--color-black)] rounded" required="">
+        <input type="password" placeholder="Contraseña" class="w-full p-2 border border-[var(--color-black)] rounded" required="">
+        <button type="submit" class="btn-dark w-full">INGRESAR</button>
+      </form>
+      <button id="google-login" class="btn mt-4 w-full">Iniciar con Google</button>
+      <div id="login-info" class="mt-4 text-[var(--color-black)]" style="display: none;"></div>
+      <div id="login-user" class="mt-2 hidden" style="display: none;"></div>
+      <button id="logout" class="btn-dark mt-4 w-full hidden" style="display: none;">Cerrar Sesión</button>
+      <p class="mt-4">¿No tienes cuenta? <a href="#" class="toggle-drawer text-[var(--color-red)]" data-target="register-drawer">Regístrate</a></p>
+    </div>
+  </div>
+
+  <!-- Register Drawer -->
+  <div id="register-drawer" class="drawer">
+    <span class="drawer-close">×</span>
+    <div class="p-6">
+      <h2 class="text-[3rem] font-bebas mb-4 text-[var(--color-slate)]">Registrarse</h2>
+      <form class="space-y-4">
+        <input type="text" placeholder="Nombre Completo" class="w-full p-2 border border-[var(--color-black)] rounded" required="">
+        <input type="email" placeholder="Correo Electrónico" class="w-full p-2 border border-[var(--color-black)] rounded" required="">
+        <input type="tel" placeholder="Número de Teléfono" class="w-full p-2 border border-[var(--color-black)] rounded" required="">
+        <select class="w-full p-2 border border-[var(--color-black)] rounded" required="">
+          <option value="">Talla de Camisa</option>
+          <option value="S">S</option>
+          <option value="M">M</option>
+          <option value="L">L</option>
+          <option value="XL">XL</option>
+        </select>
+        <input type="text" placeholder="Contacto de Emergencia" class="w-full p-2 border border-[var(--color-black)] rounded" required="">
+        <input type="tel" placeholder="Teléfono de Emergencia" class="w-full p-2 border border-[var(--color-black)] rounded" required="">
+        <textarea placeholder="Condiciones Médicas" class="w-full p-2 border border-[var(--color-black)] rounded" rows="3"></textarea>
+        <label class="flex items-center">
+          <input type="checkbox" class="mr-2" required="">
+          <span>Acepto los términos y condiciones</span>
+        </label>
+        <button type="submit" class="btn-dark w-full">REGISTRARSE</button>
+      </form>
+      <p class="mt-4">¿Ya tienes cuenta? <a href="#" class="toggle-drawer text-[var(--color-red)]" data-target="login-drawer">Inicia Sesión</a></p>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script>
+    $(document).ready(function() {
+      // Countdown Timer
+      const countdownDate = new Date('2025-03-13T00:00:00').getTime();
+      const updateCountdown = () => {
+        const now = Date.now();
+        const diff = countdownDate - now;
+        if (diff <= 0) {
+          $('#days, #hours, #minutes, #seconds').text('0');
+          return;
+        }
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+        $('#days').text(days);
+        $('#hours').text(hours);
+        $('#minutes').text(minutes);
+        $('#seconds').text(seconds);
+      };
+      setInterval(updateCountdown, 1000);
+      updateCountdown();
+
+      // Carousel Logic
+      const slides = document.querySelectorAll('.slide');
+      let currentSlide = 0;
+      function showSlide(index) {
+        slides.forEach((slide, i) => {
+          slide.classList.toggle('active', i === index);
+        });
+      }
+      setInterval(() => {
+        currentSlide = (currentSlide + 1) % slides.length;
+        showSlide(currentSlide);
+      }, 5000);
+      showSlide(currentSlide);
+
+      // Smooth Scroll
+      $('a[href^="#"]').on('click', function(event) {
+        event.preventDefault();
+        const target = $(this.getAttribute('href'));
+        if (target.length) {
+          $('html, body').animate({ scrollTop: target.offset().top }, 1000);
+        }
+      });
+
+      // Drawer Toggle
+      $('.toggle-drawer').on('click', function() {
+        const target = $(this).data('target');
+        $('#' + target).toggleClass('open');
+      });
+      $('.drawer-close').on('click', function() {
+        $(this).closest('.drawer').removeClass('open');
+      });
+
+      // Mobile Menu Toggle
+      $('#mobileMenuBtn').on('click', function() {
+        $('#mobileMenu').toggleClass('hidden');
+      });
+
+      // FAQs Collapsible
+      $('#faqs button').on('click', function() {
+        const answer = $(this).next();
+        answer.toggleClass('hidden');
+        $(this).find('span:last').text(answer.hasClass('hidden') ? '+' : '−');
+      });
+
+      // Subscription Form
+      $('#subscription-form').on('submit', function(event) {
+        event.preventDefault();
+        const name = $(this).find('input[type="text"]').val();
+        const email = $(this).find('input[type="email"]').val();
+        if (name && validateEmail(email)) {
+          alert('Gracias por suscribirte, ' + name + '!');
+          $(this)[0].reset();
+        } else {
+          alert('Por favor, ingresa un nombre y correo válidos.');
+        }
+      });
+
+      function validateEmail(email) {
+        const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return re.test(String(email).toLowerCase());
+      }
+
+      // Firebase Configuration (Replace with your credentials)
+      const firebaseConfig = {
+        apiKey: "YOUR_API_KEY",
+        authDomain: "YOUR_AUTH_DOMAIN",
+        projectId: "YOUR_PROJECT_ID",
+        storageBucket: "YOUR_STORAGE_BUCKET",
+        messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+        appId: "YOUR_APP_ID"
+      };
+      firebase.initializeApp(firebaseConfig);
+
+      // Google Authentication
+      const provider = new firebase.auth.GoogleAuthProvider();
+      const $loginInfo = $('#login-info');
+      const $loginUser = $('#login-user');
+      const $loginForm = $('#login-form');
+      const $logoutBtn = $('#logout');
+
+      const DOM = {
+        isLogined: function(userData) {
+          $loginForm.hide();
+          $loginInfo.text('¡Estás conectado vía Google!').show();
+          $loginUser.text(userData.name).show();
+          $('<img/>').attr('src', userData.photo).appendTo($loginUser);
+          $logoutBtn.show();
+        },
+        isNotLogined: function() {
+          $loginForm.show();
+          $loginInfo.hide();
+          $loginUser.hide().empty();
+          $logoutBtn.hide();
+        }
+      };
+
+      $('#google-login').on('click', function() {
+        firebase.auth().signInWithPopup(provider).then((result) => {
+          const user = result.user;
+          DOM.isLogined({ name: user.displayName, photo: user.photoURL });
+        }).catch((error) => {
+          console.error('Authentication Failed:', error);
+          $loginInfo.text('Error al iniciar sesión');
+        });
+      });
+
+      $logoutBtn.on('click', function() {
+        firebase.auth().signOut().then(() => {
+          DOM.isNotLogined();
+        });
+      });
+
+      firebase.auth().onAuthStateChanged((user) => {
+        if (user) {
+          DOM.isLogined({ name: user.displayName, photo: user.photoURL });
+        } else {
+          DOM.isNotLogined();
+        }
+      });
+    });
+  </script>
+
+</body></html>
